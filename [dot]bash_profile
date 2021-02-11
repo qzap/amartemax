@@ -1,0 +1,119 @@
+#Usage: to place any function that can be executed by bash
+
+zins() {
+   arg1=$1
+   sudo zypper install $arg1
+}
+
+zgpg() {
+   sudo zypper --gpg-auto-import-keys refresh
+}
+
+zdel() {
+   args1=$1
+   sudo zypper remove --clean-deps $args1
+}
+
+quitd() {
+   xfce4-session-logout
+}
+
+function lp(){
+   sudo lsof -iTCP -sTCP:LISTEN -n -P
+}
+
+function km(){
+kill -2 `pgrep mongo`
+echo "All running mongo in TCP was killed."
+}
+
+function dop(){
+sudo systemctl stop docker
+sudo systemctl start docker
+docker ps -a
+#echo " "
+#docker stop $(docker ps -a -q) 
+#echo "All container has stopped."
+#docker rm $(docker ps -a -q) 
+#echo "All container has removed."
+}
+
+function dor(){
+
+   while test $# -gt 0; do
+           case "$1" in
+                -p)
+                    shift
+                    first_argument=$1
+                    shift
+                    ;;
+                *)
+                   echo "$1 is not a recognized flag!"
+                   return 1;
+                   ;;
+          esac
+  done
+  CONTAINER_PREFIX="kontainer_"
+  NEW_CTN_ID=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | cut -c1-7)
+  NEW_CTN_NAME=$CONTAINER_PREFIX$NEW_CTN_ID
+  
+  docker run -d -p $first_argument --name $NEW_CTN_NAME mongo:3.0.4 && docker exec -it $NEW_CTN_NAME bash
+
+ }
+ 
+ function ghn(){
+
+   while test $# -gt 0; do
+           case "$1" in
+                -n)
+                    shift
+                    first_argument=$1
+                    shift
+                    ;;
+                *)
+                   echo "$1 is not a recognized flag!"
+                   return 1;
+                   ;;
+          esac
+  done
+  
+  gh repo create --public $first_argument
+  cd $first_argument
+
+ }
+
+ function ghm(){
+     echo "You're set local directory: ${PWD}"
+     echo "You're in remote directory: https://github.com/qzap/${PWD##*/}"
+     echo "# ${PWD##*/}" >> README.md
+     git add README.md
+     git cm "first commit"
+     git psom
+     echo "  "
+     echo "SUCCESS create repo."
+     echo "To swift branch 'main', please write 'git b -M main'."
+}
+
+function ghk(){
+   while test $# -gt 0; do
+           case "$1" in
+                -n)
+                    shift
+                    first_argument=$1
+                    shift
+                    ;;
+                *)
+                   echo "$1 is not a recognized flag!"
+                   return 1;
+                   ;;
+          esac
+  done
+  
+  ghn -n $first_argument && ghm
+ }
+
+
+
+
+[ -r ~/.bashrc ] && source ~/.bashrc
+
